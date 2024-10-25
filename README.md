@@ -1,66 +1,36 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# URL Shortener API usage guidelines
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1. Start the server with `php artisan serve` command and open an HTTP Client (Postman, Insomnia, Thunderclient etc).
 
-## About Laravel
+2. Send a `POST` request to the `/api/v1/users` route. send this JSON data in the request body(alternatively, you can send your own form data for registration):
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```
+    {
+        "name": "Saif Kamal",
+        "email": "kamal.saifkamal534@gmail.com",
+        "password": "123456"
+    }
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+3. Now that the user is registered, send a `POST` request to `/api/v1/login` route. Send this JSON data in the request body (or the `email` & `password` credentials of yours). This will provide an API Personal Access Token in the response body. Copy the token so that you can use it as a bearer token in the subsequent request for access.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```
+    {
+        "email": "kamal.saifkamal534@gmail.com",
+        "password": "123456"
+    }
+```
 
-## Learning Laravel
+4. Now you can access the sanctum protected resources. To test whether you can access sanctum protected routes, try `api/v1/users` with the personal access token as the bearer token(Authorization)  to get the list of users in the response.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+5. To send a long URL, send a `POST` request to `/api/v1/shorten` route. Send this JSON data in the request body (or you can use any custom long URL of yours). Use the personal access token in the bearer token Authorization section in your HTTP Client GUI(Postman,Insomnia etc). Here's an example format:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```
+    {
+        "long_url": "YOUR_LONG_URL"
+    }
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+6. If you do #5, this will provide a short URL of the entered long URL in the response(v1). You can visit the link by clicking on it. The format for short URL is: `/v1/shorten/{shortUrl}`. The `shortUrl` is the 6 digit unique identifier string, not the full URL. You can find the short url unique identifiers in the `urls` table `short_url` column of the database (`database.sqlite` file). The `v1/shorten/{shortUrl}` route is not protected by sanctum so it's publicly accessible to visit.
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+7. If you want to check the visit counts for each short URL, go to `v2/shorten/{shortUrl}` route and check the database `urls` table `visit_count` column/attribute value. This is only applicable for v2.

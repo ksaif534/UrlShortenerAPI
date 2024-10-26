@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\ShortenUrlRequest;
+use App\Http\Resources\API\UserResource;
 use App\Models\Url;
 use App\Services\API\CheckExistingLongUrl;
 use App\Services\API\ShortenLongUrl;
@@ -18,9 +19,10 @@ class UrlShortenController extends Controller
      */
     public function index()
     {
-        $listOfUrls = DB::table('urls')->where('user_id', Auth::user()->id)->select('long_url')->get();
+        $listOfUrls = DB::table('urls')->where('user_id', Auth::user()->id)->get();
 
         return response()->json([
+            'userDetails' => new UserResource(Auth::user()),
             'listOfUrls' => $listOfUrls,
         ], Response::HTTP_OK);
     }

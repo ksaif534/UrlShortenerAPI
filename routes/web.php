@@ -4,7 +4,7 @@ use App\Services\API\CheckExistingShortUrl;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return to_route('redirect-url-v2','2BqeD3');
+    return to_route('redirect-url-v2', '2BqeD3');
     // return view('welcome');
 });
 
